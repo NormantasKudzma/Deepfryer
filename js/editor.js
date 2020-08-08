@@ -31,7 +31,6 @@ function deepfry(){
 	cv.add(mat, colorShift, mat);
 	colorShift.delete();
 	
-	//let outputElem = document.getElementById("output");
 	cv.imshow("output", mat);
 	mat.delete();
 }
