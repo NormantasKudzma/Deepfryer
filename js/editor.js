@@ -12,104 +12,124 @@ let sliderBlurStrength = void 0
 let original = void 0
 let staging = void 0
 
-function randomInt(max) {
+let gl = void 0
+
+function randomInt(max){
   return (Math.random() * max) | 0;
 }
 
-function clamp(num, min, max) {
+function clamp(num, min, max){
   return num <= min ? min : num >= max ? max : num;
 }
 
-function setupElement(name){
-	let e = document.getElementById(name);
-	e.oninput = deepfry;
-	return e;
+function imgToTex(elem){
+	const level = 0;
+	const internalFormat = gl.RGBA;
+	const width = elem.width;
+	const height = elem.height;
+	const border = 0;
+	const srcFormat = gl.RGBA;
+	const srcType = gl.UNSIGNED_BYTE;
+  
+	const texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, elem);
+
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+	return texture;
 }
 
-function onOpenCvReady(){
-	sliderR = setupElement("shiftRed");
-	sliderG = setupElement("shiftGreen");
-	sliderB = setupElement("shiftBlue");
-	
-	sliderGrain = setupElement("grainPercent");
-	
-	sliderBlurAngle = setupElement("blurAngle");
-	sliderBlurStrength = setupElement("blurStrength");
-	
-	let inputElem = document.getElementById("input");
-	original = cv.imread(inputElem);
-	staging = original.clone();
-	deepfry();
+function createStaticBuffer(data){
+	let buffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	return buffer;
 }
 
-function colorShift(mat){
-	let shiftR = sliderR.value & 0xff;
-	let shiftG = sliderG.value & 0xff;
-	let shiftB = sliderB.value & 0xff;
-	staging.setTo(new cv.Scalar(shiftR, shiftG, shiftB, 0));
-	cv.add(mat, staging, mat);
-}
-
-function motionBlur(mat){
-	let strength = sliderBlurStrength.value | 0;
-	if (strength <= 0) { return; }
-	
-	strength = strength * 2 + 1;
-	
-	let angle = sliderBlurAngle.value | 0;
-	let kernel = new cv.Mat(strength, strength, cv.CV_32FC1);
-	
-	const data = kernel.data32F;
-	const pivot = (strength / 2) | 0;
-	let ones = 0;
-	for (let y = 0; y < strength; ++y){
-		for (let x = 0; x < strength; ++x){
-			const dx = x - pivot;
-			const dy = pivot - y;
-			const ia = (Math.atan2(dy, dx) * 180 / Math.PI);
-			let angleDiff = Math.abs(angle - ia);
-			angleDiff = Math.min(180 - angleDiff, angleDiff);
-			data[y * strength + x] = (angleDiff <= 30 ? 1 : 0);
-			ones += data[y * strength + x];
+async function get(file){
+	return new Promise(resolve => {
+		let request = new XMLHttpRequest();
+		request.open('GET', `${file}`);
+		request.onreadystatechange = function() {
+			if (this.readyState == 4) {
+				if (this.status == 200) { resolve(this.responseText); }
+				else { throw new Error(`unable to download file ${file}`); }
+			}
 		}
-	}
-	for (let i = 0; i < strength * strength; ++i){
-		data[i] /= ones;
-	}
-	
-	cv.filter2D(mat, mat, cv.CV_8U, kernel);
-	kernel.delete();
+		request.send();
+	});
 }
 
-function grain(mat){
-	if (!mat.isContinuous()) { return; }
+async function compileShader(name){
+	const compile = (shader, source) => {
+		gl.shaderSource(shader, source);
+		gl.compileShader(shader);
+		
+		let info = gl.getShaderInfoLog(shader);
+		if (info.length > 0){
+			throw `Could not compile '${name}'. ` + info;
+		}
+		return shader;
+	};
 	
-	const channels = mat.channels();
-	const rows = mat.rows;
-	const cols = mat.cols;
-	const data = mat.data;
-	let grainPixels = rows * cols * (clamp(sliderGrain.value, 0, 99) / 100)
+	const sources = await Promise.all([get(`${name}.vs`), get(`${name}.fs`)]);
+	const vs = compile(gl.createShader(gl.VERTEX_SHADER), sources[0]);
+	const fs = compile(gl.createShader(gl.FRAGMENT_SHADER), sources[1]);
+
+	const shaderProgram = gl.createProgram();
+	gl.attachShader(shaderProgram, vs);
+	gl.attachShader(shaderProgram, fs);
+	gl.linkProgram(shaderProgram);
 	
-	while (grainPixels > 0){
-		let r = randomInt(rows);
-		let c = randomInt(cols);
-		let p = r * cols * channels + c * channels;
-		let random = randomInt(0xffffff);
-		data[p + 0] = (random >> 16) & 0xff;
-		data[p + 1] = (random >> 8) & 0xff;
-		data[p + 2] = random & 0xff;
-		--grainPixels;
+	gl.validateProgram(shaderProgram);
+	if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)){
+		let info = gl.getProgramInfoLog(shaderProgram);
+		throw `Could not link '${name}'. ` + info;
+	}
+	
+	return {
+		program: shaderProgram,
+		vertexShader: vs,
+		fragmentShader: fs,
 	}
 }
 
-function deepfry(){
-	if (!original) { return; }
-	let mat = original.clone();
+async function setup() {
+	let canvas = document.getElementById("output");
+	gl = canvas.getContext("webgl", { stencil: false, depth: false });
+	if (!gl) { console.log("no gl"); return; }
 	
-	colorShift(mat);
-	grain(mat);
-	motionBlur(mat);
+	gl.viewport(0,0, canvas.width, canvas.height);
+	gl.clearColor(0, 0, 0, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
 	
-	cv.imshow("output", mat);
-	mat.delete();
+	let vertex_buffer = createStaticBuffer([-1, 1, -1, -1, 1, -1, 1, 1]);
+	let uv_buffer = createStaticBuffer([0, 0, 0, 1, 1, 1, 1, 0]);
+
+	let compiled = await compileShader("tex");
+	let shaderProgram = compiled.program;
+
+	gl.useProgram(shaderProgram);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+	const posAttr = gl.getAttribLocation(shaderProgram, "aPos");
+	gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(posAttr);
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, uv_buffer);
+	const uvAttr = gl.getAttribLocation(shaderProgram, "aUV");
+	gl.vertexAttribPointer(uvAttr, 2, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(uvAttr);
+
+	const texUniform = gl.getUniformLocation(shaderProgram, 'uTexture');
+	gl.activeTexture(gl.TEXTURE0);
+	let tex = imgToTex(document.getElementById("input"));
+	gl.bindTexture(gl.TEXTURE_2D, tex);
+	gl.uniform1i(texUniform, 0);
+	
+	gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 }
