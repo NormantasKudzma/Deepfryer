@@ -9,23 +9,23 @@
 			<div class="panel_options mblue">
 				<div class="slider mcyan">
 					Color shift
-					<input type="range" min="0" max="255" value="0" class="slider" id="shiftRed">
-					<input type="range" min="0" max="255" value="0" class="slider" id="shiftGreen">
-					<input type="range" min="0" max="255" value="0" class="slider" id="shiftBlue">
+					<input type="range" min="0" max="255" value="255" class="slider" id="shiftRed">
+					<input type="range" min="0" max="255" value="255" class="slider" id="shiftGreen">
+					<input type="range" min="0" max="255" value="255" class="slider" id="shiftBlue">
 				</div>
 				<div class="slider mcyan">
-					Grain
-					<input type="range" min="0" max="99" value="0" class="slider" id="grainPercent">
+					Radial blur
+					<input type="range" min="60" max="130" value="100" class="slider" id="radialDistance">
+					<input type="range" min="70" max="120" value="100" class="slider" id="radialStrength">
 				</div>
 				<div class="slider mcyan">
 					Motion blur
 					<input type="range" min="0" max="179" value="0" class="slider" id="blurAngle">
 					<input type="range" min="0" max="8" value="0" class="slider" id="blurStrength">
 				</div>
-				TODO:
-				+. motion blur
-				2. transformation listas
-				3. radial blur?
+				<p>TODO:
+				<p>- render targetai
+				<p>- transformation listas
 			</div>
 			<div class="panel_image mcyan">
 				<img id="input" src="viktor.png">
