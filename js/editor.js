@@ -142,7 +142,6 @@ async function setupGL(){
 
 async function addColorShader(){
 	const shader = (await compileShader("shader/color")).program;
-
 	const texUniform = gl.getUniformLocation(shader, "uTexture");
 	const colorUniform = gl.getUniformLocation(shader, "uColor");
 	
@@ -151,10 +150,8 @@ async function addColorShader(){
 	const B = document.getElementById("shiftBlue");
 	pipeline.push(() => {
 		gl.useProgram(shader);
-		
 		gl.uniform1i(texUniform, 0);
 		gl.uniform3f(colorUniform, R.value / 0xff, G.value / 0xff, B.value / 0xff);
-		
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 	});
 	R.oninput = runPipeline;
@@ -164,7 +161,6 @@ async function addColorShader(){
 
 async function addRadialBlurShader(){
 	const shader = (await compileShader("shader/radial")).program;
-
 	const texUniform = gl.getUniformLocation(shader, "uTexture");
 	const distUniform = gl.getUniformLocation(shader, "uDistance");
 	const strUniform = gl.getUniformLocation(shader, "uStrength");
@@ -173,21 +169,35 @@ async function addRadialBlurShader(){
 	const S = document.getElementById("radialStrength");
 	pipeline.push(() => {
 		gl.useProgram(shader);
-		
 		gl.uniform1i(texUniform, 0);
 		gl.uniform1f(distUniform, D.value / 100);
 		gl.uniform1f(strUniform, S.value / 100);
-		
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 	});
 	D.oninput = runPipeline;
 	S.oninput = runPipeline;
 }
 
+async function addOutputShader(){
+	const shader = (await compileShader("shader/output")).program;
+	const texUniform = gl.getUniformLocation(shader, "uTexture");
+	const flipUniform = gl.getUniformLocation(shader, "uFlip");
+	
+	pipeline.push(() => {
+		gl.useProgram(shader);
+		gl.uniform1i(texUniform, 0);
+		gl.uniform1f(flipUniform, pipeline.length % 2 == 0 ? 1.0 : 0.0);
+		gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+	});
+}
+
 async function setup(){
 	await setupGL();
-	await addColorShader();
-	await addRadialBlurShader();
+	await Promise.all([
+		addColorShader(),
+		addRadialBlurShader(),
+		addOutputShader(),
+	]);
 	runPipeline();
 }
 
