@@ -1,5 +1,11 @@
 const templates = document.getElementsByTagName("template");
 
+function triggerReorder(panel) {
+	if (panel.onreorder){
+		panel.onreorder(panel.querySelectorAll('div.inline_container'));
+	}
+}
+
 function setupShaderPanel(panel){
 	let selected = void 0;
 	
@@ -33,7 +39,7 @@ function setupShaderPanel(panel){
 		if (isAbove){ panel.insertBefore(selected, targetRoot); }
 		else { panel.insertBefore(selected, targetRoot.nextSibling); }
 		
-		if (panel.onreorder){ panel.onreorder(panel); }
+		triggerReorder(panel);
 	};
 	
 	panel.onmousedown = (e) => {
@@ -51,7 +57,7 @@ function insertToShaderPanel(panel, selector){
 	panel.appendChild(selector.root);
 	selector.delete.onclick = () => {
 		panel.removeChild(selector.root);
-		if (panel.onreorder) { panel.onreorder(panel); }
+		triggerReorder(panel);
 	};
 }
 

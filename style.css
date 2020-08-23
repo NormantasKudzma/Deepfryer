@@ -1,6 +1,8 @@
 :root {
 	display: grid;
 	place-items: center;
+	font-family: "ABeeZee";
+	font-size: 16;
 	
 	--mred: #e63946;
 	--mredborder: #d62936;
@@ -44,8 +46,8 @@
     grid-template-columns: 1fr 2fr;
 }
 
-.panel_options {
-    margin: 5px;
+.panel {
+	padding: 2px;
 }
 	
 .panel_image {
@@ -56,13 +58,15 @@
 
 .slider {
 	width: 95%;
-	margin: 5px;
 	display: grid;
 	place-items: center;
 }
 
 .inline_container {
 	display: flex;
+	padding: 2px;
+	justify-items: stretch;
+	align-items: center;
 }
 
 .delete_icon {
@@ -74,6 +78,12 @@
 .move_icon {
 	cursor: -webkit-grab;
 	cursor: grab;
+	width: 1.5em;
+	height: 1.5em;
+}
+
+.add_icon {
+	cursor: pointer;
 	width: 1.5em;
 	height: 1.5em;
 }
