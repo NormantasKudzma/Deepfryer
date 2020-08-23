@@ -192,13 +192,15 @@ async function addOutputShader(){
 }
 
 async function setup(){
-	await setupGL();
-	await Promise.all([
-		addColorShader(),
-		addRadialBlurShader(),
-		addOutputShader(),
-	]);
-	runPipeline();
+	setupGL().then(() => {
+		Promise.all([
+			addColorShader(),
+			addRadialBlurShader(),
+			addOutputShader(),
+		]).then(() => runPipeline());
+	});
+	
+	testDivs();
 }
 
 function runPipeline(){
@@ -234,4 +236,19 @@ function runPipeline(){
 	
 	const t1 = now();
 	console.log(`Pipelines done in ${t1 - t0} ms`);
+}
+
+function testDivs(){
+	let owner = document.getElementById('test_drag');
+	setupShaderPanel(owner);
+	for (let i = 0; i < 3; ++i){
+		let div = createShaderDiv(`Shader select ${i}`);
+		div.sliders.appendChild(createSlider(0, 100, (i + 1) * 25, `${i}-slider`));
+		div.sliders.appendChild(createSlider(0, 100, (Math.random() * 100) | 0, `${i + 40}-slider`));
+	//<input type="range" min="0" max="255" value="255" class="slider" id="shiftRed">
+		insertToShaderPanel(owner, div);
+	}
+	owner.onreorder = () => {
+		console.log('panel reordered');
+	};
 }

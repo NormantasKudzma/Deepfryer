@@ -60,3 +60,20 @@
 	display: grid;
 	place-items: center;
 }
+
+.inline_container {
+	display: flex;
+}
+
+.delete_icon {
+	cursor: pointer;
+	width: 1.5em;
+	height: 1.5em;
+}
+
+.move_icon {
+	cursor: -webkit-grab;
+	cursor: grab;
+	width: 1.5em;
+	height: 1.5em;
+}
