@@ -214,6 +214,7 @@ function runPipeline(){
 	bindFramebuffer(void 0);
 	pipeline[pipeline.length - 1].render();
 	
+	gl.finish();
 	const t1 = now();
-	//console.log(`Pipelines done in ${t1 - t0} ms`);
+	console.log(`Pipelines done in ${t1 - t0} ms`);
 }
