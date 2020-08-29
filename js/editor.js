@@ -153,7 +153,7 @@ async function addColorShader(){
 	const texUniform = gl.getUniformLocation(shader, "uTexture");
 	const colorUniform = gl.getUniformLocation(shader, "uColor");
 	
-	pipeline.push({
+	pipelineAdd({
 		div: selector.root,
 		render: () => {
 			gl.useProgram(shader);
@@ -177,7 +177,7 @@ async function addRadialBlurShader(){
 	const texUniform = gl.getUniformLocation(shader, "uTexture");
 	const distUniform = gl.getUniformLocation(shader, "uDistance");
 	const strUniform = gl.getUniformLocation(shader, "uStrength");
-	pipeline.push({
+	pipelineAdd({
 		div: selector.root,
 		render: () => {
 			gl.useProgram(shader);
@@ -196,7 +196,7 @@ async function addOutputShader(){
 	const texUniform = gl.getUniformLocation(shader, "uTexture");
 	const flipUniform = gl.getUniformLocation(shader, "uFlip");
 	
-	pipeline.push({
+	pipelineAdd({
 		div: void 0,
 		render: () => {
 			gl.useProgram(shader);
@@ -205,6 +205,15 @@ async function addOutputShader(){
 			gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 		}
 	});
+}
+
+function pipelineAdd(stage){
+	if (pipeline.length == 0){
+		pipeline.push(stage);
+	}
+	else {
+		pipeline.splice(pipeline.length - 1, 0, stage);
+	}
 }
 
 async function setup(){

@@ -76,8 +76,8 @@ function setupDropdownPanel(panel, items){
 		let btn = dropdownItemTemplate.content.cloneNode(true).querySelector('div');
 		btn.innerText = k;
 		btn.onclick = async () => {
-			await items[k]();
 			hideDropdown();
+			await items[k]();
 			if (panel.onadded) {
 				panel.onadded(k);
 			}

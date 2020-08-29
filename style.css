@@ -17,33 +17,33 @@
 }
 
 .mred {
-  background-color: var(--mred);
-  border: 1px solid var(--mredborder);
+	background-color: var(--mred);
+	border: 1px solid var(--mredborder);
 }
 
 .mwhite {
-  background-color: var(--mwhite);
-  border: 1px solid var(--mwhiteborder);
+	background-color: var(--mwhite);
+	border: 1px solid var(--mwhiteborder);
 }
 
 .mcyan {
-  background-color: var(--mcyan);
-  border: 1px solid var(--mcyanborder);
+	background-color: var(--mcyan);
+	border: 1px solid var(--mcyanborder);
 }
 
 .mblue {
-  background-color: var(--mblue);
-  border: 1px solid var(--mblueborder);
+	background-color: var(--mblue);
+	border: 1px solid var(--mblueborder);
 }
 
 .mdarkblue {
-  background-color: var(--mdarkblue);
-  border: 1px solid var(--mdarkblueborder);
+	background-color: var(--mdarkblue);
+	border: 1px solid var(--mdarkblueborder);
 }
 
 .parent {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
+	display: grid;
+	grid-template-columns: 1fr 2fr;
 }
 
 .panel {
@@ -51,7 +51,7 @@
 }
 	
 .panel_image {
-    margin: 5px;
+	margin: 5px;
 	display: grid;
 	place-items: center;
 }
@@ -102,15 +102,21 @@
 }
 
 .dropdown_show {
-	display:block;
+	display: block;
 }
 
 .dropdown_button {
 	background-color: var(--mcyan);
-  border: 1px solid var(--mdarkblueborder);
+	border: 1px solid var(--mdarkblueborder);
+	height: 1.3em;
 }
 
 .dropdown_button:hover {
 	cursor: pointer;
 	background-color: var(--mblue);
+}
+
+.dropdown_button:active {
+	cursor: pointer;
+	background-color: var(--mdarkblue);
 }
