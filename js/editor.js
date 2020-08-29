@@ -142,71 +142,6 @@ async function setupGL(){
 	gl.bindFramebuffer(gl.FRAMEBUFFER, void 0)
 }
 
-async function addColorShader(){
-	const selector = createShaderDiv("Color shift");
-	const R = selector.sliders.appendChild(createSlider(0, 0xff, 0xff, "shiftRed"));
-	const G = selector.sliders.appendChild(createSlider(0, 0xff, 0xff, "shiftGreen"));
-	const B = selector.sliders.appendChild(createSlider(0, 0xff, 0xff, "shiftBlue"));
-	insertToShaderPanel(pipelinePanel, selector);
-	
-	const shader = (await compileShader("shader/color")).program;
-	const texUniform = gl.getUniformLocation(shader, "uTexture");
-	const colorUniform = gl.getUniformLocation(shader, "uColor");
-	
-	pipelineAdd({
-		div: selector.root,
-		render: () => {
-			gl.useProgram(shader);
-			gl.uniform1i(texUniform, 0);
-			gl.uniform3f(colorUniform, R.value / 0xff, G.value / 0xff, B.value / 0xff);
-			gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-		}
-	});
-	R.oninput = runPipeline;
-	G.oninput = runPipeline;
-	B.oninput = runPipeline;
-}
-
-async function addRadialBlurShader(){
-	const selector = createShaderDiv("Radial blur");
-	const D = selector.sliders.appendChild(createSlider(60, 130, 100, "radialDistance"));
-	const S = selector.sliders.appendChild(createSlider(70, 120, 100, "radialStrength"));
-	insertToShaderPanel(pipelinePanel, selector);
-	
-	const shader = (await compileShader("shader/radial")).program;
-	const texUniform = gl.getUniformLocation(shader, "uTexture");
-	const distUniform = gl.getUniformLocation(shader, "uDistance");
-	const strUniform = gl.getUniformLocation(shader, "uStrength");
-	pipelineAdd({
-		div: selector.root,
-		render: () => {
-			gl.useProgram(shader);
-			gl.uniform1i(texUniform, 0);
-			gl.uniform1f(distUniform, D.value / 100);
-			gl.uniform1f(strUniform, S.value / 100);
-			gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-		}
-	});
-	D.oninput = runPipeline;
-	S.oninput = runPipeline;
-}
-
-async function addOutputShader(){
-	const shader = (await compileShader("shader/output")).program;
-	const texUniform = gl.getUniformLocation(shader, "uTexture");
-	const flipUniform = gl.getUniformLocation(shader, "uFlip");
-	
-	pipelineAdd({
-		div: void 0,
-		render: () => {
-			gl.useProgram(shader);
-			gl.uniform1i(texUniform, 0);
-			gl.uniform1f(flipUniform, pipeline.length % 2 == 0 ? 1.0 : 0.0);
-			gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-		}
-	});
-}
-
 function pipelineAdd(stage){
 	if (pipeline.length == 0){
 		pipeline.push(stage);
@@ -234,15 +169,16 @@ async function setup(){
 	
 	const dropdownPanel = document.getElementById("dropdown_panel");
 	setupDropdownPanel(dropdownPanel, {
-		"Color shift": addColorShader,
-		"Radial blur": addRadialBlurShader
+		"Color shift": shaders.addColorShader,
+		"Radial blur": shaders.addRadialBlurShader,
+		"Contrast": shaders.addContrastShader,
 	});
 	dropdownPanel.onadded = () => {
 		runPipeline();
 	};
 	
 	setupGL().then(async () => {
-		await addOutputShader();
+		await shaders.addOutputShader();
 		runPipeline();
 	});
 }

@@ -77,7 +77,7 @@ function setupDropdownPanel(panel, items){
 		btn.innerText = k;
 		btn.onclick = async () => {
 			hideDropdown();
-			await items[k]();
+			await items[k](k);
 			if (panel.onadded) {
 				panel.onadded(k);
 			}
@@ -108,12 +108,11 @@ function createShaderDiv(title){
 	};
 }
 
-function createSlider(min, max, value, id){
+function createSlider(min, max, value){
 	const sliderTemplate = templates[1];
 	const slider = sliderTemplate.content.cloneNode(true).querySelector('input');
 	slider.min = min;
 	slider.max = max;
 	slider.value = value;
-	slider.id = id;
 	return slider;
 }
