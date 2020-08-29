@@ -53,6 +53,39 @@ function setupShaderPanel(panel){
 	};
 }
 
+function setupDropdownPanel(panel, items){
+	const dropdownDiv = document.getElementById("pipeline_dropdown");
+	const addButton = document.getElementById("add_button");
+	const showClass = "dropdown_show";
+	
+	addButton.onclick = () => {
+		if (!dropdownDiv.classList.contains(showClass)){
+			dropdownDiv.classList.add(showClass);
+		}
+	};
+	
+	const hideDropdown = () => {
+		if (dropdownDiv.classList.contains(showClass)){
+			dropdownDiv.classList.remove(showClass);
+		}
+	};
+	panel.onmouseleave = hideDropdown;
+	
+	const dropdownItemTemplate = templates[2];
+	Object.keys(items).forEach(k => {
+		let btn = dropdownItemTemplate.content.cloneNode(true).querySelector('div');
+		btn.innerText = k;
+		btn.onclick = async () => {
+			await items[k]();
+			hideDropdown();
+			if (panel.onadded) {
+				panel.onadded(k);
+			}
+		};
+		dropdownDiv.appendChild(btn);
+	});
+}
+
 function insertToShaderPanel(panel, selector){
 	panel.appendChild(selector.root);
 	selector.delete.onclick = () => {

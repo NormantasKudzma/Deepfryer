@@ -7,6 +7,6 @@ uniform lowp float uFlip;
 
 void main(void) {
 	gl_Position = vec4(aPos, 0.0, 1.0);
-    vUV = aUV;
+	vUV = aUV;
 	vUV.y = abs(uFlip - vUV.y); 
 }

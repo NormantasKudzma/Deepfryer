@@ -223,9 +223,16 @@ async function setup(){
 		runPipeline();
 	};
 	
+	const dropdownPanel = document.getElementById("dropdown_panel");
+	setupDropdownPanel(dropdownPanel, {
+		"Color shift": addColorShader,
+		"Radial blur": addRadialBlurShader
+	});
+	dropdownPanel.onadded = () => {
+		runPipeline();
+	};
+	
 	setupGL().then(async () => {
-		await addColorShader();
-		await addRadialBlurShader();
 		await addOutputShader();
 		runPipeline();
 	});
@@ -263,5 +270,5 @@ function runPipeline(){
 	pipeline[pipeline.length - 1].render();
 	
 	const t1 = now();
-	console.log(`Pipelines done in ${t1 - t0} ms`);
+	//console.log(`Pipelines done in ${t1 - t0} ms`);
 }

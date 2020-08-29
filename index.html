@@ -6,8 +6,8 @@
 		<script src="js/controls.js" type="text/javascript"></script>
 		<script src="js/editor.js" type="text/javascript"></script>
 	</head>
+	<!-- Shader selector template -->
 	<template>
-		<!-- Shader selector template -->
 		<div class="panel mcyan inline_container">
 			<img src="ico/move.png" class="move_icon" />
 			<div class="slider panel">
@@ -16,16 +16,25 @@
 			<img src="ico/delete.png" class="delete_icon" />
 		</div>
 	</template>
+	<!-- Shader slider template -->
 	<template>
 		<input type="range" min="0" max="1" value="0" class="slider" />
+	</template>
+	<!-- Dropdown button template -->
+	<template>
+		<div class="dropdown_button">Template dropdown button</div>
 	</template>
 	<body class="mwhite" onload="setup()">
 		<div class="parent">
 			<div class="panel mblue">
-				<div class="panel mcyan inline_container">
-					<img src="ico/add.png" class="add_icon" id="icon_add" />
+				<div class="panel mcyan inline_container" id="dropdown_panel" >
+					<img src="ico/add.png" class="add_icon" id="add_button">
+					</img>
 					<div class="panel">
-						Shader pipeline:
+						Render pipeline:
+						<div id="pipeline_dropdown" class="dropdown_content">
+							<!-- Filled dynamically -->
+						</div>
 					</div>
 				</div>
 				<div class="panel mblue" id="pipeline_panel">
@@ -35,6 +44,7 @@
 					<p>TODO:
 					<p>+ render targetai
 					<p>- transformation listas
+					<p>- upload download
 				</div>
 			</div>
 			<div class="panel_image mcyan">
