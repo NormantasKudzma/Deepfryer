@@ -108,11 +108,12 @@ function createShaderDiv(title){
 	};
 }
 
-function createSlider(min, max, value){
+function createSlider(min, max, value, callback){
 	const sliderTemplate = templates[1];
 	const slider = sliderTemplate.content.cloneNode(true).querySelector('input');
 	slider.min = min;
 	slider.max = max;
 	slider.value = value;
+	slider.onchange = callback;
 	return slider;
 }

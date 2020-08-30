@@ -1,5 +1,29 @@
 "use strict";
 
+const perf = {
+	doMeasure: true,
+	t0: 0,
+	now: function() {
+		if (window && window.performance && window.performance.now) { return window.performance.now(); }
+		return 0;
+	},
+	startMeasure: function() {
+		if (!this.doMeasure){ return; }
+		this.t0 = this.now();
+	},
+	endMeasure: function() {
+		if (!this.doMeasure){ return; }
+		
+		const t1 = this.now();
+		console.log(`Pipelines done in ${t1 - this.t0} ms`);
+		
+		const gle = gl.getError();
+		if (gle != gl.NO_ERROR){
+			console.log(`Opengl error occured ${gle}`);
+		}
+	}
+}
+
 let gl = void 0;
 
 let inputTexture = void 0;
@@ -63,11 +87,6 @@ async function compileShader(name){
 	const compile = (shader, source) => {
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
-		
-		let info = gl.getShaderInfoLog(shader);
-		if (info.length > 0){
-			throw `Could not compile '${name}' - ${info}`;
-		}
 		return shader;
 	};
 	
@@ -82,8 +101,10 @@ async function compileShader(name){
 	
 	gl.validateProgram(shaderProgram);
 	if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)){
-		let info = gl.getProgramInfoLog(shaderProgram);
-		throw `Could not link '${name}' - ${info}`;
+		console.error(gl.getProgramInfoLog(shaderProgram));
+		console.error(gl.getShaderInfoLog(vs));
+		console.error(gl.getShaderInfoLog(fs));
+		throw `Could not link '${name}'`;
 	}
 	
 	gl.useProgram(shaderProgram);
@@ -121,6 +142,11 @@ async function setupGL(){
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
+	gl.disable(gl.BLEND);
+	gl.disable(gl.CULL_FACE);
+	gl.disable(gl.DEPTH_TEST);
+	gl.disable(gl.SCISSOR_TEST);
+	gl.disable(gl.STENCIL_TEST);
 	
 	const createStaticBuffer = (data) => {
 		const buffer = gl.createBuffer();
@@ -195,11 +221,7 @@ async function setup(){
 function runPipeline(){
 	if (pipeline.length == 0) { return; }
 	
-	const now = () => {
-		if (window && window.performance && window.performance.now) { return window.performance.now(); }
-		return 0;
-	}
-	const t0 = now();
+	perf.startMeasure();
 	
 	const bindFramebuffer = (fb) => {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
@@ -222,7 +244,6 @@ function runPipeline(){
 	}
 	bindFramebuffer(void 0);
 	pipeline[pipeline.length - 1].render();
-	
-	const t1 = now();
-	console.log(`Pipelines done in ${t1 - t0} ms`);
+	gl.flush();
+	perf.endMeasure();
 }

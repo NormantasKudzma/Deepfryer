@@ -1,9 +1,9 @@
 const shaders = {
 	addColorShader: async (label) => {
 		const selector = createShaderDiv(label);
-		const R = selector.sliders.appendChild(createSlider(0, 0xff, 0xff));
-		const G = selector.sliders.appendChild(createSlider(0, 0xff, 0xff));
-		const B = selector.sliders.appendChild(createSlider(0, 0xff, 0xff));
+		const R = selector.sliders.appendChild(createSlider(0, 0xff, 0xff, runPipeline));
+		const G = selector.sliders.appendChild(createSlider(0, 0xff, 0xff, runPipeline));
+		const B = selector.sliders.appendChild(createSlider(0, 0xff, 0xff, runPipeline));
 		insertToShaderPanel(pipelinePanel, selector);
 		
 		const compiled = await compileShader("shader/color");		
@@ -16,14 +16,11 @@ const shaders = {
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
-		R.oninput = runPipeline;
-		G.oninput = runPipeline;
-		B.oninput = runPipeline;
 	},
 	addRadialBlurShader: async (label) => {
 		const selector = createShaderDiv(label);
-		const D = selector.sliders.appendChild(createSlider(60, 130, 100));
-		const S = selector.sliders.appendChild(createSlider(70, 120, 100));
+		const D = selector.sliders.appendChild(createSlider(60, 130, 100, runPipeline));
+		const S = selector.sliders.appendChild(createSlider(70, 120, 100, runPipeline));
 		insertToShaderPanel(pipelinePanel, selector);
 		
 		const compiled = await compileShader("shader/radial");
@@ -37,12 +34,10 @@ const shaders = {
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
-		D.oninput = runPipeline;
-		S.oninput = runPipeline;
 	},
 	addBrightnessShader: async (label) => {
 		const selector = createShaderDiv(label);
-		const B = selector.sliders.appendChild(createSlider(25, 350, 125));
+		const B = selector.sliders.appendChild(createSlider(25, 350, 125, runPipeline));
 		insertToShaderPanel(pipelinePanel, selector);
 		
 		const compiled = await compileShader("shader/brightness");
@@ -55,11 +50,10 @@ const shaders = {
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
-		B.oninput = runPipeline;
 	},
 	addContrastShader: async (label) => {
 		const selector = createShaderDiv(label);
-		const C = selector.sliders.appendChild(createSlider(25, 350, 125));
+		const C = selector.sliders.appendChild(createSlider(25, 350, 125, runPipeline));
 		insertToShaderPanel(pipelinePanel, selector);
 		
 		const compiled = await compileShader("shader/contrast");
@@ -72,7 +66,6 @@ const shaders = {
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
-		C.oninput = runPipeline;
 	},
 	addOutputShader: async () => {
 		const compiled = await compileShader("shader/output");
