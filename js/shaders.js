@@ -6,16 +6,13 @@ const shaders = {
 		const B = selector.sliders.appendChild(createSlider(0, 0xff, 0xff));
 		insertToShaderPanel(pipelinePanel, selector);
 		
-		const shader = (await compileShader("shader/color")).program;
-		const texUniform = gl.getUniformLocation(shader, "uTexture");
-		const colorUniform = gl.getUniformLocation(shader, "uColor");
-		
+		const compiled = await compileShader("shader/color");		
 		pipelineAdd({
 			div: selector.root,
 			render: () => {
-				gl.useProgram(shader);
-				gl.uniform1i(texUniform, 0);
-				gl.uniform3f(colorUniform, R.value / 0xff, G.value / 0xff, B.value / 0xff);
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform3f(compiled.uniform["uColor"], R.value / 0xff, G.value / 0xff, B.value / 0xff);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
@@ -29,54 +26,62 @@ const shaders = {
 		const S = selector.sliders.appendChild(createSlider(70, 120, 100));
 		insertToShaderPanel(pipelinePanel, selector);
 		
-		const shader = (await compileShader("shader/radial")).program;
-		const texUniform = gl.getUniformLocation(shader, "uTexture");
-		const distUniform = gl.getUniformLocation(shader, "uDistance");
-		const strUniform = gl.getUniformLocation(shader, "uStrength");
+		const compiled = await compileShader("shader/radial");
 		pipelineAdd({
 			div: selector.root,
 			render: () => {
-				gl.useProgram(shader);
-				gl.uniform1i(texUniform, 0);
-				gl.uniform1f(distUniform, D.value / 100);
-				gl.uniform1f(strUniform, S.value / 100);
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform1f(compiled.uniform["uDistance"], D.value / 100);
+				gl.uniform1f(compiled.uniform["uStrength"], S.value / 100);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
 		D.oninput = runPipeline;
 		S.oninput = runPipeline;
 	},
+	addBrightnessShader: async (label) => {
+		const selector = createShaderDiv(label);
+		const B = selector.sliders.appendChild(createSlider(25, 350, 125));
+		insertToShaderPanel(pipelinePanel, selector);
+		
+		const compiled = await compileShader("shader/brightness");
+		pipelineAdd({
+			div: selector.root,
+			render: () => {
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform1f(compiled.uniform["uMultiplier"], B.value / 100);
+				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+			}
+		});
+		B.oninput = runPipeline;
+	},
 	addContrastShader: async (label) => {
 		const selector = createShaderDiv(label);
 		const C = selector.sliders.appendChild(createSlider(25, 350, 125));
 		insertToShaderPanel(pipelinePanel, selector);
 		
-		const shader = (await compileShader("shader/contrast")).program;
-		const texUniform = gl.getUniformLocation(shader, "uTexture");
-		const multiplierUniform = gl.getUniformLocation(shader, "uMultiplier");
-		
+		const compiled = await compileShader("shader/contrast");
 		pipelineAdd({
 			div: selector.root,
 			render: () => {
-				gl.useProgram(shader);
-				gl.uniform1i(texUniform, 0);
-				gl.uniform1f(multiplierUniform, C.value / 100);
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform1f(compiled.uniform["uMultiplier"], C.value / 100);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
 		C.oninput = runPipeline;
 	},
 	addOutputShader: async () => {
-		const shader = (await compileShader("shader/output")).program;
-		const texUniform = gl.getUniformLocation(shader, "uTexture");
-		const flipUniform = gl.getUniformLocation(shader, "uFlip");
-		
+		const compiled = await compileShader("shader/output");
 		pipelineAdd({
 			div: void 0,
 			render: () => {
-				gl.useProgram(shader);
-				gl.uniform1i(texUniform, 0);
-				gl.uniform1f(flipUniform, pipeline.length % 2 == 0 ? 1.0 : 0.0);
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform1f(compiled.uniform["uFlip"], pipeline.length % 2 == 0 ? 1.0 : 0.0);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});

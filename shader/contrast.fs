@@ -4,5 +4,6 @@ uniform sampler2D uTexture;
 uniform highp float uMultiplier;
 
 void main(void) {
-	gl_FragColor = texture2D(uTexture, vUV) * vec4(uMultiplier, uMultiplier, uMultiplier, 1.0);
+	gl_FragColor = texture2D(uTexture, vUV);
+	gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * uMultiplier + 0.5;
 }

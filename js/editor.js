@@ -97,10 +97,18 @@ async function compileShader(name){
 	gl.vertexAttribPointer(uvAttr, 2, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(uvAttr);
 	
+	const numUniforms = gl.getProgramParameter(shaderProgram, gl.ACTIVE_UNIFORMS);
+	let uniforms = {};
+	for (let i = 0; i < numUniforms; ++i){
+		let u = gl.getActiveUniform(shaderProgram, i);
+		uniforms[u.name] = gl.getUniformLocation(shaderProgram, u.name);
+	}
+	
 	compiledShaders[name] = {
 		program: shaderProgram,
 		vs: vs,
 		fs: fs,
+		uniform: uniforms,
 	};
 	return compiledShaders[name];
 }
@@ -171,6 +179,7 @@ async function setup(){
 	setupDropdownPanel(dropdownPanel, {
 		"Color shift": shaders.addColorShader,
 		"Radial blur": shaders.addRadialBlurShader,
+		"Brightness": shaders.addBrightnessShader,
 		"Contrast": shaders.addContrastShader,
 	});
 	dropdownPanel.onadded = () => {
@@ -214,7 +223,6 @@ function runPipeline(){
 	bindFramebuffer(void 0);
 	pipeline[pipeline.length - 1].render();
 	
-	gl.finish();
 	const t1 = now();
 	console.log(`Pipelines done in ${t1 - t0} ms`);
 }
