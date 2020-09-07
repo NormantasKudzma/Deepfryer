@@ -67,6 +67,28 @@ const shaders = {
 			}
 		});
 	},
+	addNoiseShader: async (label) => {
+		const selector = createShaderDiv(label);
+		const D = selector.sliders.appendChild(createSlider(0, 100, 50, runPipeline));
+		const S = selector.sliders.appendChild(createSlider(4, 300, 4, runPipeline));
+		const A = selector.sliders.appendChild(createSlider(1, 100, 75, runPipeline));
+		insertToShaderPanel(pipelinePanel, selector);
+		
+		const compiled = await compileShader("shader/noise");
+		const seed = Math.abs(Math.sin((Date.now() | 0) * 1.61803398874989484820459));
+		pipelineAdd({
+			div: selector.root,
+			render: () => {
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform1f(compiled.uniform["uDensity"], D.value / 100);
+				gl.uniform1f(compiled.uniform["uSize"], (S.max | 0) + (S.min | 0) - (S.value | 0));
+				gl.uniform1f(compiled.uniform["uSeed"], seed);
+				gl.uniform1f(compiled.uniform["uAlpha"], A.value / 100);
+				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+			}
+		});
+	},
 	addOutputShader: async () => {
 		const compiled = await compileShader("shader/output");
 		pipelineAdd({

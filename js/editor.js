@@ -207,6 +207,7 @@ async function setup(){
 		"Radial blur": shaders.addRadialBlurShader,
 		"Brightness": shaders.addBrightnessShader,
 		"Contrast": shaders.addContrastShader,
+		"Noise": shaders.addNoiseShader,
 	});
 	dropdownPanel.onadded = () => {
 		runPipeline();
