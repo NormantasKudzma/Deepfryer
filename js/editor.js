@@ -1,31 +1,8 @@
 "use strict";
 
-const perf = {
-	doMeasure: true,
-	t0: 0,
-	now: function() {
-		if (window && window.performance && window.performance.now) { return window.performance.now(); }
-		return 0;
-	},
-	startMeasure: function() {
-		if (!this.doMeasure){ return; }
-		this.t0 = this.now();
-	},
-	endMeasure: function() {
-		if (!this.doMeasure){ return; }
-		
-		const t1 = this.now();
-		console.log(`Pipelines done in ${t1 - this.t0} ms`);
-		
-		const gle = gl.getError();
-		if (gle != gl.NO_ERROR){
-			console.log(`Opengl error occured ${gle}`);
-		}
-	}
-}
-
 let gl = void 0;
 
+let inputImage = void 0;
 let inputTexture = void 0;
 let framebuffers = [];
 let framebufferTextures = [];
@@ -136,10 +113,13 @@ async function compileShader(name){
 
 async function setupGL(){
 	const canvas = document.getElementById("output");
-	gl = canvas.getContext("webgl", { stencil: false, depth: false });
+	gl = canvas.getContext("webgl", {
+		stencil: false,
+		depth: false,
+		preserveDrawingBuffer:true,
+	});
 	if (!gl) { throw "No webgl context could be created"; }
 	
-	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 	gl.disable(gl.BLEND);
@@ -157,14 +137,14 @@ async function setupGL(){
 	};
 	vertexBuffer = createStaticBuffer([-1, 1, -1, -1, 1, -1, 1, 1]);
 	uvBuffer = createStaticBuffer([0, 0, 0, 1, 1, 1, 1, 0]);
-	
-	const inputImage = document.getElementById("input");
-	inputTexture = imgToTex(inputImage);
+}
 
+function recreateFramebuffers(){
+	framebufferTextures = [];
 	framebuffers = [void 0, void 0].map(_ => {
 		const framebuffer = gl.createFramebuffer();
 		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-		const framebufferTexture = newTex(inputImage.width, inputImage.height);
+		const framebufferTexture = newTex(gl.canvas.width, gl.canvas.height);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, framebufferTexture, 0);
 		const framebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 		if (framebufferStatus != gl.FRAMEBUFFER_COMPLETE){
@@ -213,14 +193,32 @@ async function setup(){
 		runPipeline();
 	};
 	
+	inputImage = document.getElementById("input");
+	inputImage.onload = () => {
+		inputTexture = imgToTex(inputImage);
+		gl.canvas.classList.remove("hidden");
+		gl.canvas.width = inputImage.width;
+		gl.canvas.height = inputImage.height;
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+		recreateFramebuffers();
+		runPipeline();
+	};
+	const uploadButton = document.getElementById("upload_button");
+	uploadButton.addEventListener('change', function() {
+		if (this.files && this.files[0]) {
+			inputImage.src = URL.createObjectURL(this.files[0]);
+		}
+	});
+	
 	setupGL().then(async () => {
 		await shaders.addOutputShader();
-		runPipeline();
+		debug.onSetupGL();
 	});
 }
 
 function runPipeline(){
 	if (pipeline.length == 0) { return; }
+	if (!inputTexture) { return; }
 	
 	perf.startMeasure();
 	
@@ -245,6 +243,5 @@ function runPipeline(){
 	}
 	bindFramebuffer(void 0);
 	pipeline[pipeline.length - 1].render();
-	gl.flush();
 	perf.endMeasure();
 }

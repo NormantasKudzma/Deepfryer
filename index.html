@@ -3,6 +3,7 @@
 		<title>Deepfry it</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=ABeeZee">
 		<link rel="stylesheet" type="text/css" href="style.css">
+		<script src="js/debug.js" type="text/javascript"></script>
 		<script src="js/shaders.js" type="text/javascript"></script>
 		<script src="js/controls.js" type="text/javascript"></script>
 		<script src="js/editor.js" type="text/javascript"></script>
@@ -28,6 +29,9 @@
 	<body class="mwhite" onload="setup()">
 		<div class="parent">
 			<div class="panel mblue">
+				<div class="panel mcyan inline_container">
+					<input type="file" id="upload_button" accept="image/png, image/jpeg, image/webp" />
+				</div>
 				<div class="panel mcyan inline_container" id="dropdown_panel" >
 					<div>
 						<div id="pipeline_dropdown" class="dropdown_content">
@@ -45,14 +49,19 @@
 				</div>
 				<div class="mcyan panel">
 					<p>TODO:
-					<p>+ render targetai
-					<p>+ transformation listas
-					<p>- upload download
+					<p>- HSV shaderis
+					<p>+ upload download
+					<p>- maziau shitty interfeisas
+					<p>- scalinimo problemos
+					<p>- defaultiniai presetai
+					<p>- presetu cachinimas
+					<p>- color pickeriai ir kiti normalesni controlsai
+					<p>? mobile layoutas
 				</div>
 			</div>
 			<div class="panel_image mcyan">
-				<img id="input" src="viktor.png">
-				<canvas id="output" width="512" height="512"></canvas>
+				<img id="input" class="hidden" />
+				<canvas id="output" width="0" height="0" class="hidden" />
 			</div>
 		</div>
 	</body>

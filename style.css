@@ -52,6 +52,7 @@
 	
 .panel_image {
 	margin: 5px;
+	padding: 5px;
 	display: grid;
 	place-items: center;
 }
@@ -119,4 +120,8 @@
 .dropdown_button:active {
 	cursor: pointer;
 	background-color: var(--mdarkblue);
+}
+
+.hidden {
+	display: none;
 }
