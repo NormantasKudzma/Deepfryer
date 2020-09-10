@@ -30,7 +30,13 @@
 		<div class="parent">
 			<div class="panel mblue">
 				<div class="panel mcyan inline_container">
-					<input type="file" id="upload_button" accept="image/png, image/jpeg, image/webp" />
+					<label for="upload_button">
+						<img src="ico/upload.png" class="upload_icon" />
+					</label>
+					<input class="hidden" id="upload_button" type="file" accept="image/png, image/jpeg, image/webp"/>
+					<div class="panel">
+						Select an image
+					</div>
 				</div>
 				<div class="panel mcyan inline_container" id="dropdown_panel" >
 					<div>
@@ -38,8 +44,7 @@
 							<!-- Filled dynamically -->
 						</div>
 					</div>
-					<img src="ico/add.png" class="add_icon" id="add_button">
-					</img>
+					<img src="ico/add.png" class="add_icon" id="add_button" />
 					<div class="panel">
 						Add to render pipeline:
 					</div>
@@ -63,6 +68,9 @@
 				<img id="input" class="hidden" />
 				<canvas id="output" width="0" height="0" class="hidden" />
 			</div>
+			<a href="https://github.com/NormantasKudzma/Deepfryer" target="_blank">
+				<img src="ico/github.png" class="github" />
+			</a>
 		</div>
 	</body>
 </html>
