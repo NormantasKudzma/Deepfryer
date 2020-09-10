@@ -117,3 +117,15 @@ function createSlider(min, max, value, callback){
 	slider.onchange = callback;
 	return slider;
 }
+
+function hide(e) {
+	if (!e.classList.contains("hidden")) {
+		e.classList.add("hidden");
+	}
+}
+
+function show(e) {
+	if (e.classList.contains("hidden")) {
+		e.classList.remove("hidden");
+	}
+}

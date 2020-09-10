@@ -1,4 +1,4 @@
-const debugEnabled = location.hostname == "localhost";
+const debugEnabled = false;//location.hostname == "localhost";
 
 const perf = {
 	t0: 0,

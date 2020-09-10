@@ -193,10 +193,12 @@ async function setup(){
 		runPipeline();
 	};
 	
+	const firstRun = document.getElementById("first_run");
 	inputImage = document.getElementById("input");
 	inputImage.onload = () => {
 		inputTexture = imgToTex(inputImage);
-		gl.canvas.classList.remove("hidden");
+		hide(firstRun);
+		show(gl.canvas);
 		gl.canvas.width = inputImage.width;
 		gl.canvas.height = inputImage.height;
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
