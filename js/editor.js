@@ -114,6 +114,7 @@ async function compileShader(name){
 async function setupGL(){
 	const canvas = document.getElementById("output");
 	gl = canvas.getContext("webgl", {
+		premultipliedAlpha: false,
 		stencil: false,
 		depth: false,
 		preserveDrawingBuffer:true,
@@ -211,6 +212,38 @@ async function setup(){
 			inputImage.src = URL.createObjectURL(this.files[0]);
 		}
 	});
+	document.addEventListener('paste', (e) => {
+		if (!e.clipboardData) { return; }
+		const items = e.clipboardData.items;
+		if (!items) return;
+		
+		for (let i = 0; i < items.length; ++i){
+			if (items[i].type.indexOf("image") == -1) { continue; }
+			const blob = items[i].getAsFile();
+			inputImage.src = URL.createObjectURL(blob);
+			e.preventDefault();
+			break;
+		}
+	});
+	firstRun.ondrop = (e) => {
+		e.preventDefault();
+		const items = e.dataTransfer.items;
+		for (let i = 0; i < items.length; ++i){
+			if (items[i].type.indexOf("image") != -1){
+				inputImage.src = URL.createObjectURL(items[i].getAsFile());
+				break;
+			}
+			else if (items[i].type.indexOf("uri") != -1){
+				items[i].getAsString((uri) => {
+					inputImage.src = uri;
+				});
+				break;
+			}
+		}
+	};
+	firstRun.ondragover = (e) => {
+		e.preventDefault();
+	};
 	
 	setupGL().then(async () => {
 		await shaders.addOutputShader();
