@@ -1,4 +1,12 @@
-const debugEnabled = false;//location.hostname == "localhost";
+const debugEnabled = location.hostname == "localhost";
+
+function implOrEmpty(o) {
+	if (debugEnabled) { return; }
+	const empty = () => {};
+	Object.keys(o).forEach(k => {
+		o[k] = empty;
+	});
+}
 
 const perf = {
 	t0: 0,
@@ -22,6 +30,7 @@ const perf = {
 		}
 	}
 }
+implOrEmpty(perf);
 
 const debug = {
 	onSetupGL: function() {
@@ -29,3 +38,5 @@ const debug = {
 		inputImage.src = 'viktor.png';
 	}
 }
+
+implOrEmpty(debug);

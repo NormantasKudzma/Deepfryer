@@ -114,7 +114,7 @@ function createSlider(min, max, value, callback){
 	slider.min = min;
 	slider.max = max;
 	slider.value = value;
-	slider.onchange = callback;
+	slider.oninput = callback;
 	return slider;
 }
 

@@ -15,6 +15,10 @@ let pipeline = [];
 
 let pipelinePanel = void 0;
 
+let lastRun = 0;
+let runDelay = 1000 * (1 / 10);
+let queuedPipeline = void 0;
+
 function newTex(w, h, data){
 	const level = 0;
 	const internalFormat = gl.RGBA;
@@ -255,6 +259,19 @@ function runPipeline(){
 	if (pipeline.length == 0) { return; }
 	if (!inputTexture) { return; }
 	
+	const now = Date.now();
+	if (now < lastRun + runDelay) {
+		if (!queuedPipeline){
+			const next = Math.min(lastRun + runDelay - now, runDelay) + 1;
+			queuedPipeline = setTimeout(() => {
+				runPipeline();
+				queuedPipeline = void 0;
+			}, next);
+		}
+		return;
+	}
+	
+	lastRun = now;	
 	perf.startMeasure();
 	
 	const bindFramebuffer = (fb) => {
