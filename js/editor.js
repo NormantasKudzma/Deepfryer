@@ -193,6 +193,7 @@ async function setup(){
 		"Brightness": shaders.addBrightnessShader,
 		"Contrast": shaders.addContrastShader,
 		"Noise": shaders.addNoiseShader,
+		"Sharpen": shaders.addSharpenShader,
 	});
 	dropdownPanel.onadded = () => {
 		runPipeline();

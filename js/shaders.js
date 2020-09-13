@@ -54,6 +54,7 @@ const shaders = {
 	addContrastShader: async (label) => {
 		const selector = createShaderDiv(label);
 		const C = selector.sliders.appendChild(createSlider(25, 350, 125, runPipeline));
+		const S = selector.sliders.appendChild(createSlider(25, 350, 125, runPipeline));
 		insertToShaderPanel(pipelinePanel, selector);
 		
 		const compiled = await compileShader("shader/contrast");
@@ -62,7 +63,8 @@ const shaders = {
 			render: () => {
 				gl.useProgram(compiled.program);
 				gl.uniform1i(compiled.uniform["uTexture"], 0);
-				gl.uniform1f(compiled.uniform["uMultiplier"], C.value / 100);
+				gl.uniform1f(compiled.uniform["uContrast"], C.value / 100);
+				gl.uniform1f(compiled.uniform["uSaturation"], S.value / 100);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
@@ -85,6 +87,22 @@ const shaders = {
 				gl.uniform1f(compiled.uniform["uSize"], (S.max | 0) + (S.min | 0) - (S.value | 0));
 				gl.uniform1f(compiled.uniform["uSeed"], seed);
 				gl.uniform1f(compiled.uniform["uAlpha"], A.value / 100);
+				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+			}
+		});
+	},
+	addSharpenShader: async(label) => {
+		const selector = createShaderDiv(label);
+		const D = selector.sliders.appendChild(createSlider(1, 20, 3, runPipeline));
+		insertToShaderPanel(pipelinePanel, selector);
+		
+		const compiled = await compileShader("shader/sharpen");
+		pipelineAdd({
+			div: selector.root,
+			render: () => {
+				gl.useProgram(compiled.program);
+				gl.uniform1i(compiled.uniform["uTexture"], 0);
+				gl.uniform1f(compiled.uniform["uDistance"], D.value / 400);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 			}
 		});
